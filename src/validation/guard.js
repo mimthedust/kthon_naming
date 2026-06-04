@@ -95,19 +95,25 @@ personal인 경우 meme 필드를 반드시 채우세요:
 "${text.replace(/"/g, '\\"')}"`;
 
   try {
-    const res = await fetch('/api/generate', {
+    const res = await fetch(GROQ_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+      },
       body: JSON.stringify({
+        model:           GROQ_MODEL,
         messages: [
           { role: 'system', content: '당신은 입력 텍스트의 의도를 분류하는 분류기입니다. 반드시 JSON만 출력하세요.' },
           { role: 'user',   content: prompt },
         ],
+        temperature:     0.3,
+        response_format: { type: 'json_object' },
       }),
     });
-    const raw = await res.text();
-    const cleaned = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-    const parsed = JSON.parse(cleaned);
+    const groqJson = await res.json();
+    const content  = groqJson?.choices?.[0]?.message?.content || '';
+    const parsed   = JSON.parse(content);
     if (['ok', 'personal', 'offcontext'].includes(parsed?.category)) {
       return { category: parsed.category, summary: parsed.summary || '', meme: parsed.meme || null };
     }

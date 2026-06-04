@@ -347,17 +347,20 @@ async function callAI(usp, prevNames, feedbackNote) {
 
     let res, raw;
     try {
-      res = await fetch('/api/generate', {
+      res = await fetch(GROQ_URL, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+        },
         body: JSON.stringify({
+          model:           GROQ_MODEL,
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user',   content: userMessage },
           ],
-          model:    'openai',
-          seed:     Math.floor(Math.random() * 99999),
-          jsonMode: true,
+          temperature:     1.0,
+          response_format: { type: 'json_object' },
         }),
       });
       raw = await res.text();
@@ -366,22 +369,24 @@ async function callAI(usp, prevNames, feedbackNote) {
       throw new Error('AI 서버에 연결할 수 없습니다. 네트워크를 확인해 주세요.');
     }
 
-    let errCheck;
-    try { errCheck = JSON.parse(raw); } catch {}
+    let groqJson;
+    try { groqJson = JSON.parse(raw); } catch {}
 
-    if (res.status === 429 || errCheck?.status === 429) {
+    if (res.status === 429 || groqJson?.error?.code === 'rate_limit_exceeded') {
       if (attempt < MAX_RETRIES - 1) continue;
       throw new Error('AI 서버가 일시적으로 바쁩니다. 잠시 후 다시 시도해 주세요.');
     }
-    if (!res.ok || errCheck?.error) {
-      throw new Error(errCheck?.error || `오류가 발생했습니다 (${res.status})`);
+    if (!res.ok || groqJson?.error) {
+      throw new Error(groqJson?.error?.message || `오류가 발생했습니다 (${res.status})`);
     }
 
-    const cleaned = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    const content = groqJson?.choices?.[0]?.message?.content;
+    if (!content) { if (attempt < MAX_RETRIES - 1) continue; throw new Error('응답을 받지 못했습니다.'); }
+
     let parsed;
-    try { parsed = JSON.parse(cleaned); }
+    try { parsed = JSON.parse(content); }
     catch {
-      const m = raw.match(/\{[\s\S]*\}/);
+      const m = content.match(/\{[\s\S]*\}/);
       if (!m) { if (attempt < MAX_RETRIES - 1) continue; throw new Error('응답을 파싱할 수 없습니다.'); }
       try { parsed = JSON.parse(m[0]); }
       catch { if (attempt < MAX_RETRIES - 1) continue; throw new Error('응답을 파싱할 수 없습니다.'); }
