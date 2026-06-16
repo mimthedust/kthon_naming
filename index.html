@@ -22,7 +22,7 @@
           <img src="assets/images/Kbank_M.png" alt="Kbank" class="logo-img">
         </div>
         <div class="header-title">
-          <span class="header-title-text">네이밍 생성기</span>
+          <span class="header-title-text">K/THON 작명소</span>
           <span class="header-badge">AI Beta</span>
         </div>
       </div>
@@ -88,7 +88,7 @@
       <!-- ① 입력 화면 -->
       <section id="inputSection" class="section">
         <div class="section-headline">
-          <h1 class="headline-title headline-title--jua">K/THON 작명소 🤔</h1>
+          <h1 class="headline-title headline-title--jua">K/THON 작명소<span class="headline-emoji">🤔</span></h1>
           <p class="headline-sub">어떤 서비스인지 알려주시면 이름을 지어 드려요.</p>
         </div>
 
@@ -111,10 +111,12 @@
               <button class="idea-type-card" data-type="process" onclick="selectIdeaType('process')">
                 <span class="idea-type-icon">🔄</span>
                 <span class="idea-type-label">업무 프로세스<br>개선 아이디어</span>
+                <span class="idea-type-tooltip">다양한 사내 업무를 보다 쉽고 심플하게 개선하는 기능을 도입하고 싶을때 사용해 보세요!</span>
               </button>
               <button class="idea-type-card" data-type="product" onclick="selectIdeaType('product')">
                 <span class="idea-type-icon">💡</span>
                 <span class="idea-type-label">신규 상품 ·<br>서비스 아이디어</span>
+                <span class="idea-type-tooltip">고객들에게 선보일 신박한 상품/서비스 아이디어의 이름을 지을 때 사용해 보세요</span>
               </button>
               <button class="idea-type-card idea-type-card--disabled" data-type="beta" onclick="selectIdeaType('beta')">
                 <span class="idea-type-icon">🔒</span>
@@ -194,6 +196,7 @@
             </button>
           </div>
           <p class="feedback-hint" id="retryHint"></p>
+          <button id="copyResultsBtn" class="copy-results-btn" onclick="copyResults()">📋 결과 복사하기</button>
         </div>
       </section>
 
@@ -213,7 +216,7 @@
     </main>
 
     <footer class="footer">
-      <span>케이뱅크 내부 기획 도구 · AI 생성 결과는 반드시 법무·브랜드 검토 후 활용하세요</span>
+      <span>케이뱅크 내부 기획 도구입니다. AI로 생성된 결과는 반드시 관련 내규를 검토해보시고 활용하세요</span>
     </footer>
   </div>
 

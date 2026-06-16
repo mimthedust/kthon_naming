@@ -6,5 +6,7 @@
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {}
+  "devDependencies": {
+    "cfb": "^1.2.2"
+  }
 }
