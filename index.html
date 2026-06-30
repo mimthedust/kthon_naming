@@ -433,13 +433,7 @@
       width: 100%; background: #F0F2F7; border-radius: 14px;
       overflow: hidden; margin-bottom: 20px; border: 1px solid #E0E4EE;
     }
-    .chat-header {
-      background: #fff; padding: 10px 14px; border-bottom: 1px solid #EEF0F5;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .chat-hicon { font-size: 13px; }
-    .chat-hname { font-size: 12px; font-weight: 700; color: #17191E; flex: 1; }
-    .chat-hcount { font-size: 10px; color: #6A7385; }
+
     .chat-msgs { padding: 14px 10px; display: flex; flex-direction: column; gap: 14px; }
     .chat-row { display: flex; gap: 8px; align-items: flex-start; }
     .chat-row.me { flex-direction: row-reverse; }
@@ -1470,53 +1464,83 @@ personal인 경우 meme 필드를 반드시 채우세요:
     return '생활/편의';
   }
 
-  function showAppPreview(name) {
+  async function showAppPreview(name) {
     document.getElementById('preview-modal-name').textContent = name;
 
-    var safe = function(s) {
-      return s.replace(/[<>&"']/g, function(c) {
+    var chatEl = document.getElementById('chat-mock');
+    var COLORS = ['#6B7AFF','#20C997','#FF7043','#F59E0B','#8B5CF6','#EC4899','#14B8A6'];
+
+    function safe(s) {
+      return String(s).replace(/[<>&"']/g, function(c) {
         return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];
       });
-    };
-    var n = safe(name);
+    }
 
-    // 채팅 메시지 데이터
-    var rows = [
-      { avatar:'이', color:'#6B7AFF', sender:'이재원 팀장', time:'오전 10:23', me:false,
-        msg:'새 서비스 네이밍 오늘 안으로 결정해야 할 것 같아요. 좋은 후보 있으면 공유해줘요 😊' },
-      { avatar:'김', color:'#20C997', sender:'김수진', time:'오전 10:25', me:false,
-        msg:'<span class="chat-hl">' + n + '</span> 어떨까요?<br>이름만 봐도 기능이 딱 와닿을 것 같아서요!' },
-      { avatar:'박', color:'#FF7043', sender:'박민준', time:'오전 10:26', me:false,
-        msg:'오 <span class="chat-hl">' + n + '</span> 너무 좋은데요 👍' },
-      { avatar:'나', color:'#4262FF', sender:'나', time:'오전 10:27', me:true,
-        msg:'<span class="chat-hl">' + n + '</span>, 고객분들도 보자마자 이해할 것 같아요 🎉' },
-    ];
+    function renderChat(msgs) {
+      var colorMap = {};
+      var colorIdx = 0;
+      msgs.forEach(function(m) {
+        if (!colorMap[m.name]) colorMap[m.name] = COLORS[colorIdx++ % COLORS.length];
+      });
+      var nn = safe(name);
+      var rows = msgs.map(function(m, i) {
+        var isMe = (i === msgs.length - 1);
+        var msgSafe = safe(m.text).split(nn).join('<span class="chat-hl">' + nn + '</span>');
+        return '<div class="chat-row' + (isMe ? ' me' : '') + '">' +
+          '<div class="chat-avatar" style="background:' + (colorMap[m.name] || COLORS[0]) + '">' +
+            safe(m.name.charAt(0)) +
+          '</div>' +
+          '<div class="chat-col">' +
+            (isMe ? '' : '<div class="chat-sender">' + safe(m.name) + '</div>') +
+            '<div class="chat-bubble">' + msgSafe + '</div>' +
+            '<div class="chat-meta">' + (isMe ? '방금' : '조금 전') + '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      chatEl.innerHTML = '<div class="chat-msgs">' + rows.join('') + '</div>';
+    }
 
-    var msgsHtml = rows.map(function(r) {
-      var cls = r.me ? 'chat-row me' : 'chat-row';
-      var senderHtml = r.me ? '' : '<div class="chat-sender">' + r.sender + '</div>';
-      var reactionHtml = (!r.me && rows.indexOf(r) === 1)
-        ? '<div><span class="chat-reaction">👍 3</span></div>' : '';
-      return '<div class="' + cls + '">' +
-        '<div class="chat-avatar" style="background:' + r.color + '">' + r.avatar + '</div>' +
-        '<div class="chat-col">' +
-          senderHtml +
-          '<div class="chat-bubble">' + r.msg + '</div>' +
-          reactionHtml +
-          '<div class="chat-meta">' + r.time + '</div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-
-    document.getElementById('chat-mock').innerHTML =
-      '<div class="chat-header">' +
-        '<span class="chat-hicon">💬</span>' +
-        '<span class="chat-hname">서비스기획 채널</span>' +
-        '<span class="chat-hcount">멤버 12</span>' +
-      '</div>' +
-      '<div class="chat-msgs">' + msgsHtml + '</div>';
-
+    // 로딩 표시 후 모달 오픈
+    chatEl.innerHTML = '<div style="padding:48px 0;text-align:center;color:#B0B7C9;font-size:12px">대화 생성 중...</div>';
     document.getElementById('modal-app-preview').hidden = false;
+
+    var cat = (typeof selectedRole !== 'undefined' && selectedRole) ? selectedRole : '';
+    var prompt = '케이뱅크 앱 신규 서비스명 "' + name + '"' +
+      (cat ? ' (카테고리: ' + cat + ')' : '') +
+      '이 처음 공개되는 상황에서 직원들이 주고받는 사내 메신저 대화를 만들어주세요.\n\n' +
+      '조건:\n' +
+      '- 서로 다른 이름의 직원 3명, 메시지 총 4개 (한 명이 2번 발언)\n' +
+      '- 각 메시지 1~2문장\n' +
+      '- "' + name + '"이 자연스럽게 2번 이상 등장\n' +
+      '- 이름에서 연상되는 서비스의 구체적 기능·혜택을 맥락에 맞게 언급\n' +
+      '- 한국 직장인 말투, 이모지 1~2개\n' +
+      '- 이름은 한국인 성+이름 (예: 홍길동)\n\n' +
+      'JSON만 출력: {"messages":[{"name":"이름","text":"내용"},{"name":"이름","text":"내용"},{"name":"이름","text":"내용"},{"name":"이름","text":"내용"}]}';
+
+    try {
+      var res = await fetch(GEMINI_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: '사내 메신저 대화를 생성하는 어시스턴트입니다. JSON만 출력하세요.' }] },
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 500 }
+        })
+      });
+      var gjson = await res.json();
+      var text = (gjson?.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+      var data = JSON.parse(text);
+      if (Array.isArray(data.messages) && data.messages.length >= 3) {
+        renderChat(data.messages);
+      } else { throw new Error('bad'); }
+    } catch(e) {
+      renderChat([
+        { name: '이재원', text: '새 서비스 네이밍 후보 정해야 할 것 같은데 좋은 거 있으면 공유해줘요 😊' },
+        { name: '김수진', text: name + ' 어떨까요? 이름만 봐도 기능이 딱 와닿을 것 같아서요!' },
+        { name: '박민준', text: '오 ' + name + ' 완전 좋은데요 👍' },
+        { name: '이재원', text: name + ', 고객분들도 바로 이해할 것 같아요 🎉' },
+      ]);
+    }
   }
   function closeAppPreview() {
     document.getElementById('modal-app-preview').hidden = true;
