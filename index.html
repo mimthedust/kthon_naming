@@ -336,7 +336,6 @@
     .nc-divider   { height: 1px; background: var(--divider); margin-bottom: 16px; }
     .nc-rationale { flex: 1; font-size: 13px; color: var(--ink-quaternary); line-height: 1.65; }
     .nc-copy {
-      margin-top: 18px; align-self: flex-end;
       height: 30px; padding: 0 12px; border-radius: var(--r-chip);
       border: 1px solid var(--border);
       font-size: 12px; font-weight: 600; color: var(--ink-assistive);
@@ -420,7 +419,7 @@
       cursor: pointer; transition: background .12s, border-color .12s, color .12s;
     }
     .btn-apply-card:hover { background: var(--bg); border-color: var(--border-strong); }
-    .nc-btn-row { display: flex; gap: 8px; margin-top: 16px; }
+    .nc-btn-row { display: flex; gap: 8px; margin-top: 16px; align-items: center; }
     /* ── 앱 미리보기 모달 ── */
     .app-preview-modal {
       background: var(--canvas); border-radius: 24px;
@@ -433,55 +432,19 @@
       width: 220px; height: 390px; margin: 0 auto 20px;
       border-radius: 30px; overflow: hidden;
       box-shadow: 0 0 0 8px #111, 0 8px 32px rgba(0,0,0,.35);
-      position: relative; background: #F7F8FB;
+      position: relative; background: #fff;
     }
     .phone-screen-inner {
-      width: 100%; height: 100%; overflow-y: scroll; overflow-x: hidden; position: relative;
+      width: 100%; height: 100%; overflow-y: scroll; overflow-x: hidden;
       scrollbar-width: none;
     }
     .phone-screen-inner::-webkit-scrollbar { display: none; }
-    /* ── Mock App ── */
-    .mock-app { background: #F7F8FB; font-family: 'Pretendard',sans-serif; padding-bottom: 20px; }
-    .ma-header {
-      background: #fff; padding: 10px 12px 8px;
-      border-bottom: 1px solid #E4E8F0;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 2;
+    /* ── PNG 오버레이 ── */
+    .phone-img-wrap { position: relative; width: 100%; }
+    .phone-img { width: 100%; display: block; }
+    .ap-ov {
+      position: absolute; display: flex; align-items: center; box-sizing: border-box;
     }
-    .ma-logo { font-size: 11px; font-weight: 900; color: #4262FF; letter-spacing: -0.5px; }
-    .ma-user { font-size: 10px; font-weight: 700; color: #17191E; }
-    .ma-bell { font-size: 13px; }
-    .ma-section { padding: 10px 12px 0; }
-    .ma-section-title { font-size: 10px; font-weight: 800; color: #17191E; margin-bottom: 8px; letter-spacing: -0.3px; }
-    .ma-rec-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
-    .ma-rec-item {
-      background: #fff; border-radius: 8px; padding: 7px 10px;
-      display: flex; align-items: center; gap: 8px;
-      border: 1px solid #E4E8F0;
-    }
-    .ma-rec-item.highlight { border-color: #4262FF; background: #EDF3FF; }
-    .ma-rec-rank { font-size: 10px; font-weight: 800; color: #6A7385; width: 20px; flex-shrink: 0; }
-    .ma-rec-item.highlight .ma-rec-rank { color: #4262FF; }
-    .ma-rec-icon { width: 22px; height: 22px; border-radius: 6px; background: #EDF3FF; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
-    .ma-rec-item.highlight .ma-rec-icon { background: #4262FF; }
-    .ma-rec-name { font-size: 10px; font-weight: 700; color: #17191E; }
-    .ma-rec-item.highlight .ma-rec-name { color: #0114A7; font-weight: 800; }
-    .ma-recent-row { display: flex; gap: 8px; margin-bottom: 10px; }
-    .ma-recent-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .ma-recent-icon { width: 36px; height: 36px; border-radius: 10px; background: #fff; border: 1px solid #E4E8F0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-    .ma-recent-item.highlight .ma-recent-icon { background: #EDF3FF; border-color: #4262FF; }
-    .ma-recent-label { font-size: 9px; font-weight: 600; color: #6A7385; max-width: 40px; text-align: center; word-break: keep-all; }
-    .ma-recent-item.highlight .ma-recent-label { color: #4262FF; font-weight: 700; }
-    .ma-divider { height: 6px; background: #E4E8F0; margin: 4px 0; }
-    .ma-tabs-section { padding: 10px 12px; }
-    .ma-tabs-title { font-size: 10px; font-weight: 800; color: #17191E; margin-bottom: 8px; }
-    .ma-tabs-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
-    .ma-tab-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 2px 6px; border-radius: 8px; background: #fff; border: 1px solid #E4E8F0; }
-    .ma-tab-item.highlight { background: #EDF3FF; border-color: #4262FF; }
-    .ma-tab-icon { font-size: 15px; }
-    .ma-tab-label { font-size: 8px; font-weight: 600; color: #6A7385; text-align: center; word-break: keep-all; line-height: 1.3; }
-    .ma-tab-item.highlight .ma-tab-label { color: #4262FF; font-weight: 700; }
-    .ma-new-badge { font-size: 7px; font-weight: 800; color: #fff; background: #4262FF; border-radius: 4px; padding: 1px 3px; line-height: 1.4; }
     .btn-close-preview {
       width: 100%; height: 44px; border-radius: var(--r-button);
       background: var(--primary); color: #fff;
@@ -809,7 +772,11 @@
       <p class="app-preview-title" id="preview-modal-name"></p>
       <p class="app-preview-sub">케이뱅크 앱에 반영하면 이런 모습이에요</p>
       <div class="phone-wrap">
-        <div class="phone-screen-inner" id="phone-screen-inner"></div>
+        <div class="phone-screen-inner" id="phone-screen-inner">
+          <div class="phone-img-wrap" id="phone-img-wrap">
+            <img src="./main_tab.png" class="phone-img" id="phone-img-el" alt="앱 미리보기">
+          </div>
+        </div>
       </div>
       <button class="btn-close-preview" onclick="closeAppPreview()">확인했어요</button>
     </div>
@@ -1482,97 +1449,82 @@ personal인 경우 meme 필드를 반드시 채우세요:
     return '생활/편의';
   }
 
-  function buildMockApp(name, usp) {
-    const cat = detectCategory(name, usp);
-    const CATS = [
-      { label: '이체/출금', icon: '💸' },
-      { label: '계좌/카드', icon: '💳' },
-      { label: '대출',     icon: '🏦' },
-      { label: '투자',     icon: '📈' },
-      { label: '해외',     icon: '🌏' },
-      { label: '생활/편의', icon: '🛍️' },
-      { label: '사장님',   icon: '👔' },
-      { label: '청소년',   icon: '🎒' },
-    ];
-    const tabsHtml = CATS.map(c => {
-      const hi = c.label === cat;
-      return `<div class="ma-tab-item${hi ? ' highlight' : ''}">${hi ? '<div class="ma-new-badge">NEW</div>' : ''}
-        <div class="ma-tab-icon">${c.icon}</div>
-        <div class="ma-tab-label">${hi ? name : c.label}</div>
-      </div>`;
-    }).join('');
-
-    return `<div class="mock-app">
-      <div class="ma-header">
-        <div class="ma-logo">Kbank</div>
-        <div class="ma-user">손흥민 님</div>
-        <div class="ma-bell">🔔</div>
-      </div>
-      <div class="ma-section">
-        <div class="ma-section-title">⭐ 상품·서비스 추천</div>
-        <div class="ma-rec-list">
-          <div class="ma-rec-item highlight">
-            <div class="ma-rec-rank">1위</div>
-            <div class="ma-rec-icon">✨</div>
-            <div class="ma-rec-name">${name}</div>
-          </div>
-          <div class="ma-rec-item">
-            <div class="ma-rec-rank">2위</div>
-            <div class="ma-rec-icon">💳</div>
-            <div class="ma-rec-name">K머니 플러스</div>
-          </div>
-          <div class="ma-rec-item">
-            <div class="ma-rec-rank">3위</div>
-            <div class="ma-rec-icon">📈</div>
-            <div class="ma-rec-name">K인베스트</div>
-          </div>
-        </div>
-        <div class="ma-section-title">🕐 최근 이용</div>
-        <div class="ma-recent-row">
-          <div class="ma-recent-item highlight">
-            <div class="ma-recent-icon">✨</div>
-            <div class="ma-recent-label">${name}</div>
-          </div>
-          <div class="ma-recent-item">
-            <div class="ma-recent-icon">💸</div>
-            <div class="ma-recent-label">이체</div>
-          </div>
-          <div class="ma-recent-item">
-            <div class="ma-recent-icon">💳</div>
-            <div class="ma-recent-label">카드</div>
-          </div>
-          <div class="ma-recent-item">
-            <div class="ma-recent-icon">🏦</div>
-            <div class="ma-recent-label">대출</div>
-          </div>
-        </div>
-      </div>
-      <div class="ma-divider"></div>
-      <div class="ma-tabs-section">
-        <div class="ma-tabs-title">서비스 카테고리</div>
-        <div class="ma-tabs-grid">${tabsHtml}</div>
-      </div>
-    </div>`;
-  }
-
   function showAppPreview(name) {
     document.getElementById('preview-modal-name').textContent = name;
-    const screen = document.getElementById('phone-screen-inner');
     const usp = (typeof uspInput !== 'undefined' && uspInput) ? uspInput.value : '';
-    screen.innerHTML = buildMockApp(name, usp);
+    const cat = detectCategory(name, usp);
+
+    // 카테고리별 top% (main_tab.png 기준, 이미지 전체 높이 대비)
+    const catTopMap = {
+      '이체/출금': '55%', '계좌/카드': '63%', '대출': '71%',
+      '투자': '79%', '해외': '85%', '생활/편의': '91%',
+      '사장님': '97%', '청소년': '103%'
+    };
+    const catTop = catTopMap[cat] || '91%';
+
+    const safe = function(s) {
+      return s.replace(/[<>&"']/g, function(c) {
+        return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];
+      });
+    };
+    const n = safe(name);
+
+    const wrap = document.getElementById('phone-img-wrap');
+    // 기존 오버레이만 제거 (이미지는 유지)
+    wrap.querySelectorAll('.ap-ov').forEach(function(el) { el.remove(); });
+
+    // 오버레이 생성 헬퍼
+    function ov(styles, html) {
+      var d = document.createElement('div');
+      d.className = 'ap-ov';
+      Object.assign(d.style, styles);
+      d.innerHTML = html;
+      wrap.appendChild(d);
+    }
+
+    // ① 김보경 → 손흥민
+    ov({ top:'9.5%', left:'3%', width:'32%', height:'3%',
+         background:'#fff', borderRadius:'3px', paddingLeft:'5px',
+         fontFamily:'Pretendard,sans-serif', fontSize:'9px',
+         fontWeight:'700', color:'#17191E' },
+       '손흥민');
+
+    // ② 상품·서비스 추천 1위 행 오버레이
+    ov({ top:'28%', left:'2%', width:'95%', height:'4.5%',
+         background:'rgba(237,243,255,0.97)', borderRadius:'10px',
+         border:'1.5px solid #4262FF', padding:'0 8px', gap:'6px' },
+       '<span style="font-size:8px;font-weight:800;color:#4262FF;width:16px;flex-shrink:0">1위</span>' +
+       '<span style="width:20px;height:20px;border-radius:5px;background:#4262FF;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">✨</span>' +
+       '<span style="font-size:9px;font-weight:800;color:#0114A7;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">' + n + '</span>');
+
+    // ③ 최근 이용 첫 번째 항목 오버레이
+    ov({ top:'43.5%', left:'3%', width:'20%', height:'7%',
+         background:'#EDF3FF', border:'1.5px solid #4262FF', borderRadius:'10px',
+         flexDirection:'column', justifyContent:'center', gap:'2px',
+         fontFamily:'Pretendard,sans-serif' },
+       '<span style="font-size:13px;line-height:1">✨</span>' +
+       '<span style="font-size:6.5px;font-weight:700;color:#4262FF;text-align:center;max-width:38px;word-break:keep-all;line-height:1.25;padding:0 2px">' + n + '</span>');
+
+    // ④ 해당 카테고리 항목 오버레이
+    ov({ top:catTop, left:'2%', width:'95%', height:'3.8%',
+         background:'rgba(237,243,255,0.95)', border:'1.2px solid #4262FF',
+         borderRadius:'7px', padding:'0 8px', gap:'6px' },
+       '<span style="font-size:9px;font-weight:800;color:#0114A7;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">' + n + '</span>' +
+       '<span style="font-size:7px;background:#4262FF;color:#fff;padding:1px 4px;border-radius:3px;font-weight:800;flex-shrink:0">NEW</span>');
+
+    // 스크롤 애니메이션
+    var screen = document.getElementById('phone-screen-inner');
     screen.scrollTop = 0;
-    let startTime = null;
+    var startTime = null;
     function animate(ts) {
       if (!startTime) startTime = ts;
-      const elapsed = ts - startTime;
-      const duration = 3200;
-      const p = Math.min(elapsed / duration, 1);
-      const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
-      const maxScroll = screen.scrollHeight - screen.clientHeight;
-      if (maxScroll > 0) screen.scrollTop = ease * maxScroll;
+      var p = Math.min((ts - startTime) / 3800, 1);
+      var ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+      var maxScroll = screen.scrollHeight - screen.clientHeight;
+      if (maxScroll > 0) screen.scrollTop = ease * maxScroll * 0.85;
       if (p < 1) requestAnimationFrame(animate);
     }
-    setTimeout(() => requestAnimationFrame(animate), 350);
+    setTimeout(function() { requestAnimationFrame(animate); }, 400);
     document.getElementById('modal-app-preview').hidden = false;
   }
   function closeAppPreview() {
