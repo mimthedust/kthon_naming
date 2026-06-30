@@ -428,22 +428,47 @@
     }
     .app-preview-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
     .app-preview-sub   { font-size: 12px; color: var(--ink-tertiary); margin-bottom: 18px; }
-    .phone-wrap {
-      width: 220px; height: 390px; margin: 0 auto 20px;
-      border-radius: 30px; overflow: hidden;
-      box-shadow: 0 0 0 8px #111, 0 8px 32px rgba(0,0,0,.35);
-      position: relative; background: #fff;
+    /* ── 메신저 채팅 목업 ── */
+    .chat-mock {
+      width: 100%; background: #F0F2F7; border-radius: 14px;
+      overflow: hidden; margin-bottom: 20px; border: 1px solid #E0E4EE;
     }
-    .phone-screen-inner {
-      width: 100%; height: 100%; overflow-y: scroll; overflow-x: hidden;
-      scrollbar-width: none;
+    .chat-header {
+      background: #fff; padding: 10px 14px; border-bottom: 1px solid #EEF0F5;
+      display: flex; align-items: center; gap: 6px;
     }
-    .phone-screen-inner::-webkit-scrollbar { display: none; }
-    /* ── PNG 오버레이 ── */
-    .phone-img-wrap { position: relative; width: 100%; }
-    .phone-img { width: 100%; display: block; }
-    .ap-ov {
-      position: absolute; display: flex; align-items: center; box-sizing: border-box;
+    .chat-hicon { font-size: 13px; }
+    .chat-hname { font-size: 12px; font-weight: 700; color: #17191E; flex: 1; }
+    .chat-hcount { font-size: 10px; color: #6A7385; }
+    .chat-msgs { padding: 14px 10px; display: flex; flex-direction: column; gap: 14px; }
+    .chat-row { display: flex; gap: 8px; align-items: flex-start; }
+    .chat-row.me { flex-direction: row-reverse; }
+    .chat-avatar {
+      width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+      font-size: 11px; font-weight: 800; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .chat-col { max-width: 74%; }
+    .chat-row.me .chat-col { display: flex; flex-direction: column; align-items: flex-end; }
+    .chat-sender { font-size: 9px; font-weight: 700; color: #6A7385; margin-bottom: 3px; }
+    .chat-bubble {
+      display: inline-block; background: #fff;
+      border-radius: 4px 12px 12px 12px;
+      padding: 8px 11px; font-size: 11px; line-height: 1.65; color: #17191E;
+      box-shadow: 0 1px 3px rgba(0,0,0,.07); text-align: left;
+    }
+    .chat-row.me .chat-bubble {
+      background: #4262FF; color: #fff;
+      border-radius: 12px 4px 12px 12px;
+    }
+    .chat-hl { font-weight: 800; color: #4262FF; }
+    .chat-row.me .chat-hl { color: #C5D5FF; }
+    .chat-meta { font-size: 8px; color: #B0B7C9; margin-top: 3px; }
+    .chat-row.me .chat-meta { text-align: right; }
+    .chat-reaction {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: #fff; border: 1px solid #E0E4EE; border-radius: 20px;
+      padding: 2px 7px; font-size: 10px; margin-top: 4px; cursor: default;
     }
     .btn-close-preview {
       width: 100%; height: 44px; border-radius: var(--r-button);
@@ -770,14 +795,8 @@
   <div class="backdrop" id="modal-app-preview" hidden onclick="if(event.target===this)closeAppPreview()">
     <div class="app-preview-modal" role="dialog">
       <p class="app-preview-title" id="preview-modal-name"></p>
-      <p class="app-preview-sub">케이뱅크 앱에 반영하면 이런 모습이에요</p>
-      <div class="phone-wrap">
-        <div class="phone-screen-inner" id="phone-screen-inner">
-          <div class="phone-img-wrap" id="phone-img-wrap">
-            <img src="./main_tab.png" class="phone-img" id="phone-img-el" alt="앱 미리보기">
-          </div>
-        </div>
-      </div>
+      <p class="app-preview-sub">팀 채널에서 이런 이름으로 소통하게 돼요</p>
+      <div class="chat-mock" id="chat-mock"></div>
       <button class="btn-close-preview" onclick="closeAppPreview()">확인했어요</button>
     </div>
   </div>
@@ -1451,80 +1470,50 @@ personal인 경우 meme 필드를 반드시 채우세요:
 
   function showAppPreview(name) {
     document.getElementById('preview-modal-name').textContent = name;
-    const usp = (typeof uspInput !== 'undefined' && uspInput) ? uspInput.value : '';
-    const cat = detectCategory(name, usp);
 
-    // 카테고리별 top% (main_tab.png 기준, 이미지 전체 높이 대비)
-    const catTopMap = {
-      '이체/출금': '55%', '계좌/카드': '63%', '대출': '71%',
-      '투자': '79%', '해외': '85%', '생활/편의': '91%',
-      '사장님': '97%', '청소년': '103%'
-    };
-    const catTop = catTopMap[cat] || '91%';
-
-    const safe = function(s) {
+    var safe = function(s) {
       return s.replace(/[<>&"']/g, function(c) {
         return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];
       });
     };
-    const n = safe(name);
+    var n = safe(name);
 
-    const wrap = document.getElementById('phone-img-wrap');
-    // 기존 오버레이만 제거 (이미지는 유지)
-    wrap.querySelectorAll('.ap-ov').forEach(function(el) { el.remove(); });
+    // 채팅 메시지 데이터
+    var rows = [
+      { avatar:'이', color:'#6B7AFF', sender:'이재원 팀장', time:'오전 10:23', me:false,
+        msg:'새 서비스 네이밍 오늘 안으로 결정해야 할 것 같아요. 좋은 후보 있으면 공유해줘요 😊' },
+      { avatar:'김', color:'#20C997', sender:'김수진', time:'오전 10:25', me:false,
+        msg:'<span class="chat-hl">' + n + '</span> 어떨까요?<br>이름만 봐도 기능이 딱 와닿을 것 같아서요!' },
+      { avatar:'박', color:'#FF7043', sender:'박민준', time:'오전 10:26', me:false,
+        msg:'오 <span class="chat-hl">' + n + '</span> 너무 좋은데요 👍' },
+      { avatar:'나', color:'#4262FF', sender:'나', time:'오전 10:27', me:true,
+        msg:'<span class="chat-hl">' + n + '</span>, 고객분들도 보자마자 이해할 것 같아요 🎉' },
+    ];
 
-    // 오버레이 생성 헬퍼
-    function ov(styles, html) {
-      var d = document.createElement('div');
-      d.className = 'ap-ov';
-      Object.assign(d.style, styles);
-      d.innerHTML = html;
-      wrap.appendChild(d);
-    }
+    var msgsHtml = rows.map(function(r) {
+      var cls = r.me ? 'chat-row me' : 'chat-row';
+      var senderHtml = r.me ? '' : '<div class="chat-sender">' + r.sender + '</div>';
+      var reactionHtml = (!r.me && rows.indexOf(r) === 1)
+        ? '<div><span class="chat-reaction">👍 3</span></div>' : '';
+      return '<div class="' + cls + '">' +
+        '<div class="chat-avatar" style="background:' + r.color + '">' + r.avatar + '</div>' +
+        '<div class="chat-col">' +
+          senderHtml +
+          '<div class="chat-bubble">' + r.msg + '</div>' +
+          reactionHtml +
+          '<div class="chat-meta">' + r.time + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
 
-    // ① 김보경 → 손흥민
-    ov({ top:'9.5%', left:'3%', width:'32%', height:'3%',
-         background:'#fff', borderRadius:'3px', paddingLeft:'5px',
-         fontFamily:'Pretendard,sans-serif', fontSize:'9px',
-         fontWeight:'700', color:'#17191E' },
-       '손흥민');
+    document.getElementById('chat-mock').innerHTML =
+      '<div class="chat-header">' +
+        '<span class="chat-hicon">💬</span>' +
+        '<span class="chat-hname">서비스기획 채널</span>' +
+        '<span class="chat-hcount">멤버 12</span>' +
+      '</div>' +
+      '<div class="chat-msgs">' + msgsHtml + '</div>';
 
-    // ② 상품·서비스 추천 1위 행 오버레이
-    ov({ top:'28%', left:'2%', width:'95%', height:'4.5%',
-         background:'rgba(237,243,255,0.97)', borderRadius:'10px',
-         border:'1.5px solid #4262FF', padding:'0 8px', gap:'6px' },
-       '<span style="font-size:8px;font-weight:800;color:#4262FF;width:16px;flex-shrink:0">1위</span>' +
-       '<span style="width:20px;height:20px;border-radius:5px;background:#4262FF;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">✨</span>' +
-       '<span style="font-size:9px;font-weight:800;color:#0114A7;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">' + n + '</span>');
-
-    // ③ 최근 이용 첫 번째 항목 오버레이
-    ov({ top:'43.5%', left:'3%', width:'20%', height:'7%',
-         background:'#EDF3FF', border:'1.5px solid #4262FF', borderRadius:'10px',
-         flexDirection:'column', justifyContent:'center', gap:'2px',
-         fontFamily:'Pretendard,sans-serif' },
-       '<span style="font-size:13px;line-height:1">✨</span>' +
-       '<span style="font-size:6.5px;font-weight:700;color:#4262FF;text-align:center;max-width:38px;word-break:keep-all;line-height:1.25;padding:0 2px">' + n + '</span>');
-
-    // ④ 해당 카테고리 항목 오버레이
-    ov({ top:catTop, left:'2%', width:'95%', height:'3.8%',
-         background:'rgba(237,243,255,0.95)', border:'1.2px solid #4262FF',
-         borderRadius:'7px', padding:'0 8px', gap:'6px' },
-       '<span style="font-size:9px;font-weight:800;color:#0114A7;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">' + n + '</span>' +
-       '<span style="font-size:7px;background:#4262FF;color:#fff;padding:1px 4px;border-radius:3px;font-weight:800;flex-shrink:0">NEW</span>');
-
-    // 스크롤 애니메이션
-    var screen = document.getElementById('phone-screen-inner');
-    screen.scrollTop = 0;
-    var startTime = null;
-    function animate(ts) {
-      if (!startTime) startTime = ts;
-      var p = Math.min((ts - startTime) / 3800, 1);
-      var ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
-      var maxScroll = screen.scrollHeight - screen.clientHeight;
-      if (maxScroll > 0) screen.scrollTop = ease * maxScroll * 0.85;
-      if (p < 1) requestAnimationFrame(animate);
-    }
-    setTimeout(function() { requestAnimationFrame(animate); }, 400);
     document.getElementById('modal-app-preview').hidden = false;
   }
   function closeAppPreview() {
